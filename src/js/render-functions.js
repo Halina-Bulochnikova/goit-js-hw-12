@@ -1,10 +1,11 @@
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+
+
 export function renderImages(images) {
   const gallery = document.querySelector(".gallery");
-
-  const markup = images
+  const markup = images.hits
     .map(
       (image) => `
         <a href="${image.largeImageURL}" class="gallery-item">
@@ -23,9 +24,7 @@ export function renderImages(images) {
     `
     )
     .join("");
-
-  gallery.innerHTML = markup;
-
+  gallery.insertAdjacentHTML("beforeend", markup);
   const lightbox = new SimpleLightbox(".gallery a", {
     captionsData: "alt",
     captionDelay: 250,

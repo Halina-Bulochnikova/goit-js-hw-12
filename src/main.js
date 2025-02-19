@@ -7,11 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.querySelector("#search-form");
   const loader = document.querySelector(".loader");
   const gallery = document.querySelector(".gallery");
+  const loadMoreBtn = document.createElement("button");
+  loadMoreBtn.textContent = "Load more";
+  loadMoreBtn.classList.add("load-more");
+  document.body.appendChild(loadMoreBtn);
+  loadMoreBtn.style.display = "none";
+
+  let query = "";
+  let page = 1;
+  const perPage = 40;
 
   searchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-
-    const query = searchForm.elements.searchQuery.value.trim();
+    query = searchForm.elements.searchQuery.value.trim();
     if (!query) {
       iziToast.warning({
         title: "Warning",
@@ -20,19 +28,35 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       return;
     }
-
-    loader.style.display = "block";
     gallery.innerHTML = "";
-
-    try {
-      const images = await fetchImages(query);
-      renderImages(images);
-    } catch (error) {
-      
-      loader.style.display = "none";
-      return;
-    }
-
-    loader.style.display = "none";
+    page = 1;
+    loadMoreBtn.style.display = "none";
+    await loadImages();
   });
+
+  loadMoreBtn.addEventListener("click", async () => {
+    page++;
+    await loadImages();
+  });
+
+  async function loadImages() {
+    loader.style.display = "block";
+    try {
+      const images = await fetchImages(query, page, perPage);
+      renderImages(images);
+      if (page * perPage >= images.totalHits) {
+        loadMoreBtn.style.display = "none";
+        iziToast.info({
+          title: "Info",
+          message: "We're sorry, but you've reached the end of search results.",
+          position: "topRight",
+        });
+      } else {
+        loadMoreBtn.style.display = "block";
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    loader.style.display = "none";
+  }
 });
