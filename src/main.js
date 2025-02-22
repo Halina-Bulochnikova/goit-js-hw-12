@@ -44,6 +44,16 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const images = await fetchImages(query, page, perPage);
       renderImages(images);
+      
+      const galleryItems = document.querySelectorAll(".gallery-item");
+      if (galleryItems.length > 0) {
+        const cardHeight = galleryItems[0].getBoundingClientRect().height;
+        window.scrollBy({
+          top: cardHeight * 2,
+          behavior: "smooth",
+        });
+      }
+  
       if (page * perPage >= images.totalHits) {
         loadMoreBtn.style.display = "none";
         iziToast.info({
@@ -59,4 +69,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loader.style.display = "none";
   }
+  
 });
